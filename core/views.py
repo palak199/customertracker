@@ -7,6 +7,28 @@ from django.db.models.functions import ExtractHour
 from django.contrib.auth.decorators import login_required
 from .forms import CustomerForm
 from .models import item
+import pyrebase
+
+config = {
+  "apiKey": "AIzaSyDCdeMINxVCsGu38B-qc05yrk1rW99Yq94",
+  "authDomain": "customertracker-378d4.firebaseapp.com",
+  "databaseURL": "https://customertracker-378d4-default-rtdb.firebaseio.com/Persons",
+  "projectId": "customertracker-378d4",
+  "storageBucket": "customertracker-378d4.appspot.com",
+  "messagingSenderId": "724650362302",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-4f8wx%40customertracker-378d4.iam.gserviceaccount.com",
+  "appId": "1:724650362302:web:7b7c079d409f17ab67e5ef",
+  "serviceAccount": "/home/palak/customertracker/core/serviceAccountCredentials.json"
+}
+
+#here we are doing firebase authentication
+firebase=pyrebase.initialize_app(config)
+authe = firebase.auth()
+database=firebase.database()
+
 @login_required(login_url="/auth/login/")
 def index(request):
         if(request.user):
@@ -72,7 +94,9 @@ def chart(request):
     return render(request, 'chartjs.html',context=context)
 
 def table(request):
-    return render(request, 'basic-table.html')
+    name = database.child('Dec-09-2021').get().val()
+    print(name)
+    return render(request, 'basic-table.html', {'name': name})
 
 def addsale(request):
     if request.method=='POST':
